@@ -31,12 +31,14 @@ class LineChart extends Sprite
 	 * @param ypos The y position to place this component.
 	 * @param data The array of numeric values to graph.
 	 */
-	function new(data:Array<Dynamic>=null):Void
+	function new(w:Float, h:Float, data:Array<Dynamic>=null):Void
 	{
 		super();
 		_chartHolder = new Shape();
 		addChild(_chartHolder);
 		_data = data;
+		_width = w;
+		_height = h;
 	}
 	
 	/**

@@ -281,7 +281,7 @@ class BazaarBot
 	
 	private var _round_num:Int = 0;
 	
-	private var list_commodities:Array<String>;			//list of string ids for all the legal commodities
+	public var list_commodities(default, null):Array<String>;			//list of string ids for all the legal commodities
 	private var list_agents:Array<Agent>;
 	private var book_bids:Map<String, Array<Offer>>;
 	private var book_asks:Map<String, Array<Offer>>;

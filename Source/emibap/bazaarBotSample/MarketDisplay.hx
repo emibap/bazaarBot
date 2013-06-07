@@ -1,6 +1,7 @@
 package emibap.bazaarBotSample;
 import com.leveluplabs.bazaarbot.BazaarBot;
 import com.leveluplabs.bazaarbot.MarketReport;
+import flash.display.Shape;
 import flash.display.Sprite;
 import flash.text.TextField;
 import flash.text.TextFormatAlign;
@@ -11,6 +12,8 @@ import flash.text.TextFormatAlign;
  */
 class MarketDisplay extends Sprite
 {
+	static private inline var CHARTS_Y	:Float	= 200.0;
+	
 	private var txt_list_commodity:TextField;
 	private var txt_list_commodity_prices:TextField;
 	private var txt_list_commodity_trades:TextField;
@@ -25,16 +28,24 @@ class MarketDisplay extends Sprite
 	private var arr_txt_list_inventory:Array<TextField>;
 	
 	
-	private var chart:LineChart;
+	private var charts:Map<String, LineChart>;
 	private var market:BazaarBot;
 	
-	public function new(W:Float,H:Float) 
+	private var chartColors:Array<Int>;
+	private var chartColorIdx	:Int = 0;
+	private var chartLabels		:Sprite;
+	
+	public function new(W:Float,H:Float, mkt:BazaarBot) 
 	{
 		super();		
 		graphics.lineStyle(1, 0);
 		graphics.beginFill(0xEEEEEE);
 		graphics.drawRect(0, 0, W, H);
 		graphics.endFill();
+		
+		market = mkt;
+		
+		chartColors = [0xFF0000, 0xFFFF00, 0x00FF00, 0x0000FF, 0xFF00FF, 0xF23380, 0x6666CC, 0xE9ED45];
 		
 		setup();
 	}	
@@ -60,10 +71,88 @@ class MarketDisplay extends Sprite
 		
 	}
 	
-	public function updateChart(data:Array<Dynamic>):Void {
+	public function updateCommodityPriceChart(?cmdts:Array<String>):Void {
+		if (cmdts == null) cmdts = market.list_commodities;
 		
-		chart.data = data;
-		chart.draw();
+		var chart:LineChart;
+		
+		for (com in cmdts) {
+			if (!charts.exists(com)) {
+				chart = new LineChart(width, 200);
+				chart.y = CHARTS_Y;
+				addChild(chart);
+				charts.set(com, chart);
+				chart.lineColor = chartColors[chartColorIdx++];
+				if (chartColorIdx == chartColors.length) chartColorIdx = 0;
+			
+			} else {
+				chart = charts.get(com);
+			}
+			
+			chart.data = market.history_price.get(com);
+			chart.draw();
+		}
+		
+		labelizeCharts();
+		
+		
+		
+		
+			
+		
+		//charts
+		
+		//chart.data = data;
+		//chart.draw();
+		
+	}
+	
+	private function labelizeCharts() 
+	{
+		if (chartLabels == null) {
+			
+			chartLabels = new Sprite();
+			chartLabels.y = CHARTS_Y + 250;
+			
+			addChild(chartLabels);
+		}
+			
+		chartLabels.removeChildren();
+		
+		var chart:LineChart;
+		
+		var cuad:Shape;
+		var txt:TextField;
+		
+		var xAcc:Float = 0;
+		var yAcc:Float = 0;
+		
+		for (key in charts.keys()) {
+			chart = charts.get(key);
+			cuad = new Shape();
+			cuad.graphics.beginFill(chart.lineColor);
+			cuad.graphics.drawRect(0, 0, 20, 20);
+			cuad.graphics.endFill();
+			
+			cuad.x = xAcc;
+			
+			xAcc += 30;
+			
+			txt = new TextField();
+			txt.width = 40;
+			txt.text = key;
+			
+			txt.x = xAcc;
+			
+			xAcc += txt.width + 20;
+			
+			chartLabels.addChild(cuad);
+			chartLabels.addChild(txt);
+			
+		}
+		
+		chartLabels.x = Math.round(chart.width / 2 - chartLabels.width / 2);
+		
 		
 	}
 	
@@ -152,9 +241,9 @@ class MarketDisplay extends Sprite
 		addChild(txt_list_agent_money);
 		
 		
-		chart = new LineChart();
+		charts = new Map<String, LineChart>();
 		//
-		addChild(chart);
-		chart.draw();
+		//addChild(chart);
+		//chart.draw();
 	}
 }

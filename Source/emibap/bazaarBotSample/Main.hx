@@ -38,7 +38,7 @@ class Main extends Sprite {
 	private function makeButtons():Void {
 		makeButton(10, 10, "Advance", onAdvance);
 		
-		display = new MarketDisplay(799, 600 - 51);
+		display = new MarketDisplay(799, 600 - 51, bazaar);
 		display.x = 0;
 		display.y = 50;
 		addChild(display);
@@ -56,7 +56,7 @@ class Main extends Sprite {
 		var benchmark:Int = 1000;
 		bazaar.simulate(benchmark);
 		display.update(bazaar.get_marketReport(1));
-		display.updateChart(bazaar.history_price.get(chartGood));
+		display.updateCommodityPriceChart(bazaar.list_commodities);
 		time = Lib.getTimer() - time;
 		var avg:Float = (cast(time, Float) / cast(benchmark, Float)) / 1000;
 		var tstr:String = BazaarBot.num_str(time / 1000, 2);
@@ -77,7 +77,7 @@ class Main extends Sprite {
 	private function onAdvance(m:MouseEvent):Void {
 		bazaar.simulate(1);
 		display.update(bazaar.get_marketReport(1));
-		display.updateChart(bazaar.history_price.get(chartGood));
+		display.updateCommodityPriceChart(bazaar.list_commodities);
 		
 		/*var str:String = "";
 		for (c in bazaar.get_commodities_unsafe()) {
