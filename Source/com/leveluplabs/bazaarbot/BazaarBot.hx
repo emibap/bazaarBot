@@ -200,6 +200,11 @@ class BazaarBot
 		return avg_list_f(list, range);
 	}
 	
+	public function get_history_trades_range(commodity_:String, range:Int):Float {
+		var list = _history_trades.get(commodity_);
+		return sum_list_f(list, range);
+	}
+	
 	public function get_commodities_unsafe():Array<String> {
 		return list_commodities;
 	}
@@ -239,7 +244,7 @@ class BazaarBot
 			var bids:Float = get_history_bids_avg(commodity, rounds);
 			mr.str_list_commodity_bids += Std.int(bids) + "\n";
 						
-			var trades:Float = get_history_trades_avg(commodity, rounds);
+			var trades:Float = get_history_trades_range(commodity, rounds);
 			mr.str_list_commodity_trades += Std.int(trades) + "\n";
 			
 			mr.arr_str_list_inventory.push(commodity + "\n\n");
@@ -718,6 +723,18 @@ class BazaarBot
 		}
 		avg /= cast(range,Float);
 		return avg;
+	}
+	
+	private static inline function sum_list_f(list:Array<Float>, range:Int):Float {
+		var sum:Float = 0;
+		var length:Int = list.length;
+		if (length < range) {
+			range = length;
+		}
+		for (i in 0...range) {
+			sum += list[length - 1 - i];
+		}
+		return sum;
 	}
 	
 	private static inline function avg_list_i(list:Array<Int>, range:Int):Float {

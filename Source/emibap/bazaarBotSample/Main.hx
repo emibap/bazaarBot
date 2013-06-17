@@ -1,5 +1,6 @@
 package emibap.bazaarBotSample;
 
+import flash.events.Event;
 import flash.Lib;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
@@ -10,6 +11,8 @@ import flash.display.Bitmap;
 import flash.display.Shape;
 import flash.display.SimpleButton;
 import flash.display.Sprite;
+import flash.utils.Timer;
+import flash.events.TimerEvent;
 import openfl.Assets;
 import flash.events.MouseEvent;
 import flash.text.TextFormatAlign;
@@ -24,6 +27,10 @@ class Main extends Sprite {
 	
 	private var chartGood:String = "food";
 	
+	var tmr:Timer;
+	var tmrBenchMark:Int = 100;
+	var rounds:Int = 0;
+	
 	public function new () {			
 		super ();		
 		
@@ -31,6 +38,10 @@ class Main extends Sprite {
 		var data:Dynamic = Json.parse(settings);
 		bazaar = new BazaarBot();
 		bazaar.init(data);
+		
+		tmr = new Timer(10, 0);
+		tmr.addEventListener(TimerEvent.TIMER, onTimerTick);
+		tmr.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete);
 		
 		makeButtons();
 	}		
@@ -45,10 +56,42 @@ class Main extends Sprite {
 		
 		makeButton(120, 10, "Benchmark", onBenchmark);		
 		txt_benchmark = new TextField();
-		txt_benchmark.x = 220;
+		txt_benchmark.x = 330;
 		txt_benchmark.y = 10;
 		txt_benchmark.width = 800 - 220;
 		addChild(txt_benchmark);
+		
+		makeButton(230, 10, "Timer switch", switchInterval);		
+	
+	}
+	
+	private function switchInterval(m:MouseEvent):Void
+	{
+		//intId =
+		if (tmr.running) {
+			tmr.stop();
+			
+			onTimerComplete();
+		} else {
+			tmr.start();
+			txt_benchmark.text = "Interval started. " + rounds + " rounds passed.";
+		}
+	}
+	
+	private function onTimerTick(e:Event):Void 
+	{
+		rounds += tmrBenchMark;
+		txt_benchmark.text = rounds + " rounds passed.";
+		bazaar.simulate(tmrBenchMark);
+		display.update(bazaar.get_marketReport(tmrBenchMark));
+		display.updateCommodityPriceChart(bazaar.list_commodities);
+	}
+	
+	private function onTimerComplete(e:Event = null):Void 
+	{
+		
+		txt_benchmark.text = "interval finished. " + rounds + " rounds passed.";
+		tmr.reset();
 	}
 	
 	private function onBenchmark(m:MouseEvent):Void{

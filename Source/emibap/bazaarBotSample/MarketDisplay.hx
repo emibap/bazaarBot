@@ -76,14 +76,18 @@ class MarketDisplay extends Sprite
 		
 		var chart:LineChart;
 		
+		var w:Float = Math.round(width * .94);
+		
 		for (com in cmdts) {
 			if (!charts.exists(com)) {
-				chart = new LineChart(width, 200);
+				chart = new LineChart(w, 200);
 				chart.y = CHARTS_Y;
-				addChild(chart);
+				chart.x = Math.round(400 - (w / 2));
+				//chart.x = 10;
 				charts.set(com, chart);
 				chart.lineColor = chartColors[chartColorIdx++];
 				if (chartColorIdx == chartColors.length) chartColorIdx = 0;
+				addChild(chart);
 			
 			} else {
 				chart = charts.get(com);
@@ -94,17 +98,7 @@ class MarketDisplay extends Sprite
 		}
 		
 		labelizeCharts();
-		
-		
-		
-		
-			
-		
-		//charts
-		
-		//chart.data = data;
-		//chart.draw();
-		
+
 	}
 	
 	private function labelizeCharts() 
