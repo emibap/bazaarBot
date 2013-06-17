@@ -31,6 +31,8 @@ class Main extends Sprite {
 	var tmrBenchMark:Int = 100;
 	var rounds:Int = 0;
 	
+	var deadRoundsInRow:Int = 0;
+	
 	public function new () {			
 		super ();		
 		
@@ -85,6 +87,25 @@ class Main extends Sprite {
 		bazaar.simulate(tmrBenchMark);
 		display.update(bazaar.get_marketReport(tmrBenchMark));
 		display.updateCommodityPriceChart(bazaar.list_commodities);
+		
+		checkDeadMarket();
+		
+	}
+	
+	// After 10 ticks without trades the market is dead.
+	private function checkDeadMarket() 
+	{
+		if (bazaar.get_history_trades_all_range(tmrBenchMark) == 0) {
+			deadRoundsInRow++;
+		} else {
+			deadRoundsInRow = 0;
+		}	
+		
+		if (deadRoundsInRow == 10) {
+			tmr.stop();
+			txt_benchmark.text = "interval finished. Dead market. " + rounds + " rounds passed.";
+			tmr.reset();
+		}
 	}
 	
 	private function onTimerComplete(e:Event = null):Void 
